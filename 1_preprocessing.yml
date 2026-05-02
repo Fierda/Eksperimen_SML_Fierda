@@ -1,0 +1,46 @@
+name: 1. Preprocessing Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'preprocessing/automate_Fierda.py'
+
+jobs:
+  preprocess:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12.7
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.7'
+
+      - name: Install Dependencies
+        run: |
+          pip install pandas numpy scikit-learn kaggle
+
+      - name: Download & Preprocess Dataset
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          python preprocessing/automate_Fierda.py
+
+      - name: Verify Output
+        run: |
+          echo "=== Verify preprocessing output ==="
+          ls -la preprocessing/
+          head -5 preprocessing/creditcard_preprocessing.csv
+          wc -l preprocessing/creditcard_preprocessing.csv
+
+      - name: Commit & Push Preprocessed Dataset
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add preprocessing/creditcard_preprocessing.csv
+          git diff --cached --quiet || git commit -m "chore: update preprocessed dataset [automated]"
+          git push
