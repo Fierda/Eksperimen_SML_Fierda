@@ -36,8 +36,8 @@ jobs:
         run: |
           echo "=== Verify preprocessing output ==="
           ls -la preprocessing/
-          head -5 preprocessing/creditcard_preprocessing.csv
-          wc -l preprocessing/creditcard_preprocessing.csv
+          head -5 preprocessing/creditcard_preprocessed.csv
+          wc -l preprocessing/creditcard_preprocessed.csv
 
       - name: Commit & Push Preprocessed Dataset
         run: |

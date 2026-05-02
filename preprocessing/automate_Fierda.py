@@ -148,7 +148,7 @@ def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(script_dir)
     raw_dir = os.path.join(project_root, "creditcard_raw")
-    output_path = os.path.join(script_dir, "creditcard_preprocessing.csv")
+    output_path = os.path.join(script_dir, "creditcard_preprocessed.csv")
 
     print("=" * 60)
     print("  AUTOMATED PREPROCESSING PIPELINE")
