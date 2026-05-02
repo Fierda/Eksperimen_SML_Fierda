@@ -41,21 +41,26 @@ if not os.path.exists(DATA_PATH):
 # DAGSHUB SETUP (optional, for Advanced)
 # ---------------------------------------------------------------------------
 def setup_dagshub():
-    if TRACKING_URI and "dagshub" in TRACKING_URI:
-        try:
-            import dagshub
-            dagshub.init(
-                repo_owner=os.environ.get("DAGSHUB_OWNER", ""),
-                repo_name=os.environ.get("DAGSHUB_REPO", ""),
-                mlflow=True,
-            )
-            print(f"[OK] DagsHub tracking active: {TRACKING_URI}")
-        except ImportError:
+    """Setup DagsHub tracking if env vars are available."""
+    if TRACKING_URI:
+        if os.environ.get("CI") == "true":
+            mlflow.set_tracking_uri(TRACKING_URI)
+            print(f"[OK] CI Environment detected. Direct MLflow tracking URI: {TRACKING_URI}")
+        elif "dagshub" in TRACKING_URI:
+            try:
+                import dagshub
+                dagshub.init(
+                    repo_owner=os.environ.get("DAGSHUB_OWNER", ""),
+                    repo_name=os.environ.get("DAGSHUB_REPO", ""),
+                    mlflow=True,
+                )
+                print(f"[OK] DagsHub tracking active: {TRACKING_URI}")
+            except ImportError:
+                mlflow.set_tracking_uri(TRACKING_URI)
+                print(f"[OK] MLflow tracking URI fallback: {TRACKING_URI}")
+        else:
             mlflow.set_tracking_uri(TRACKING_URI)
             print(f"[OK] MLflow tracking URI: {TRACKING_URI}")
-    elif TRACKING_URI:
-        mlflow.set_tracking_uri(TRACKING_URI)
-        print(f"[OK] MLflow tracking URI: {TRACKING_URI}")
     else:
         print("[INFO] Using local MLflow tracking (./mlruns)")
 
