@@ -1,0 +1,15 @@
+artifact_uri: file:///D:/Arsip%20Biru/MLOps/Eksperimen_SML_Fierda/mlruns/678313109060337909/7d67a69e38c24135a4e27f3ddacd7a20/artifacts
+end_time: 1777727963653
+entry_point_name: ''
+experiment_id: '678313109060337909'
+lifecycle_stage: active
+run_id: 7d67a69e38c24135a4e27f3ddacd7a20
+run_name: RandomForest_Basic_Autolog
+run_uuid: 7d67a69e38c24135a4e27f3ddacd7a20
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1777727953621
+status: 3
+tags: []
+user_id: LENOVO

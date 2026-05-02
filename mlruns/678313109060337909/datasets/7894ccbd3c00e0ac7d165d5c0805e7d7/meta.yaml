@@ -1,0 +1,25 @@
+digest: 5db7df63
+name: dataset
+profile: '{"num_rows": 1513, "num_elements": 45390}'
+schema: '{"mlflow_colspec": [{"type": "double", "name": "V1", "required": true}, {"type":
+  "double", "name": "V2", "required": true}, {"type": "double", "name": "V3", "required":
+  true}, {"type": "double", "name": "V4", "required": true}, {"type": "double", "name":
+  "V5", "required": true}, {"type": "double", "name": "V6", "required": true}, {"type":
+  "double", "name": "V7", "required": true}, {"type": "double", "name": "V8", "required":
+  true}, {"type": "double", "name": "V9", "required": true}, {"type": "double", "name":
+  "V10", "required": true}, {"type": "double", "name": "V11", "required": true}, {"type":
+  "double", "name": "V12", "required": true}, {"type": "double", "name": "V13", "required":
+  true}, {"type": "double", "name": "V14", "required": true}, {"type": "double", "name":
+  "V15", "required": true}, {"type": "double", "name": "V16", "required": true}, {"type":
+  "double", "name": "V17", "required": true}, {"type": "double", "name": "V18", "required":
+  true}, {"type": "double", "name": "V19", "required": true}, {"type": "double", "name":
+  "V20", "required": true}, {"type": "double", "name": "V21", "required": true}, {"type":
+  "double", "name": "V22", "required": true}, {"type": "double", "name": "V23", "required":
+  true}, {"type": "double", "name": "V24", "required": true}, {"type": "double", "name":
+  "V25", "required": true}, {"type": "double", "name": "V26", "required": true}, {"type":
+  "double", "name": "V27", "required": true}, {"type": "double", "name": "V28", "required":
+  true}, {"type": "double", "name": "Amount_scaled", "required": true}, {"type": "double",
+  "name": "Time_scaled", "required": true}]}'
+source: '{"tags": {"mlflow.user": "LENOVO", "mlflow.source.name": ".\\modelling.py",
+  "mlflow.source.type": "LOCAL", "mlflow.source.git.commit": "1487df18453799a4023c1ec2f69a21261a3e2818"}}'
+source_type: code

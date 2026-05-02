@@ -1,0 +1,119 @@
+name: MLOps Workflow
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  # ============================================================
+  # JOB 1: Preprocessing Pipeline
+  # ============================================================
+  preprocess:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12.7
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.7'
+
+      - name: Install Dependencies
+        run: |
+          pip install pandas numpy scikit-learn kaggle
+
+      - name: Download & Preprocess Dataset
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          python preprocessing/automate_Fierda.py
+
+      - name: Verify Output
+        run: |
+          echo "=== Verify preprocessing output ==="
+          ls -la preprocessing/
+          head -5 preprocessing/creditcard_preprocessed.csv
+          wc -l preprocessing/creditcard_preprocessed.csv
+
+      - name: Commit & Push Preprocessed Dataset
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add preprocessing/creditcard_preprocessed.csv
+          git diff --cached --quiet || git commit -m "chore: update preprocessed dataset [automated]"
+          git push
+
+  # ============================================================
+  # JOB 2: CI MLflow & DockerHub
+  # (runs only after preprocess job succeeds)
+  # ============================================================
+  build-and-push:
+    runs-on: ubuntu-latest
+    needs: preprocess
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12.7
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.7'
+
+      - name: Install Dependencies
+        run: |
+          pip install mlflow dagshub kaggle pandas numpy scikit-learn matplotlib seaborn
+
+      - name: Download Dataset (if not exists)
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          python preprocessing/automate_Fierda.py
+          # Copy dataset to MLProject folder
+          cp preprocessing/creditcard_preprocessed.csv MLProject_folder/creditcard_preprocessed.csv
+
+      - name: Run Training via MLflow Project
+        env:
+          MLFLOW_TRACKING_URI: ${{ secrets.DAGSHUB_URI }}
+          MLFLOW_TRACKING_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+          MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
+        run: |
+          cd MLProject_folder
+          mlflow run . --no-conda
+
+      - name: Save Artifacts to Repository
+        run: |
+          mkdir -p artifacts
+          cp -r MLProject_folder/mlruns artifacts/ 2>/dev/null || echo "mlruns managed remotely"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add artifacts/ || true
+          git diff --cached --quiet || git commit -m "chore: save training artifacts [CI]"
+          git push || true
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build & Push Docker Image
+        env:
+          MLFLOW_TRACKING_URI: ${{ secrets.DAGSHUB_URI }}
+          MLFLOW_TRACKING_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+          MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
+        run: |
+          # Build Docker image from registered model
+          # Change "models:/FraudModel/1" to match your model name & version
+          mlflow models build-docker \
+            -m "models:/FraudModel/1" \
+            -n "${{ secrets.DOCKER_USERNAME }}/fraud-api:latest"
+          docker push "${{ secrets.DOCKER_USERNAME }}/fraud-api:latest"

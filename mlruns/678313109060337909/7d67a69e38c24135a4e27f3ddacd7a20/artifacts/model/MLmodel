@@ -1,0 +1,44 @@
+artifact_path: model
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.13.2
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.8.0
+mlflow_version: 2.19.0
+model_size_bytes: 1029242
+model_uuid: 5494e400da6e43febe88beb32d7bd193
+run_id: 7d67a69e38c24135a4e27f3ddacd7a20
+signature:
+  inputs: '[{"type": "double", "name": "V1", "required": true}, {"type": "double",
+    "name": "V2", "required": true}, {"type": "double", "name": "V3", "required":
+    true}, {"type": "double", "name": "V4", "required": true}, {"type": "double",
+    "name": "V5", "required": true}, {"type": "double", "name": "V6", "required":
+    true}, {"type": "double", "name": "V7", "required": true}, {"type": "double",
+    "name": "V8", "required": true}, {"type": "double", "name": "V9", "required":
+    true}, {"type": "double", "name": "V10", "required": true}, {"type": "double",
+    "name": "V11", "required": true}, {"type": "double", "name": "V12", "required":
+    true}, {"type": "double", "name": "V13", "required": true}, {"type": "double",
+    "name": "V14", "required": true}, {"type": "double", "name": "V15", "required":
+    true}, {"type": "double", "name": "V16", "required": true}, {"type": "double",
+    "name": "V17", "required": true}, {"type": "double", "name": "V18", "required":
+    true}, {"type": "double", "name": "V19", "required": true}, {"type": "double",
+    "name": "V20", "required": true}, {"type": "double", "name": "V21", "required":
+    true}, {"type": "double", "name": "V22", "required": true}, {"type": "double",
+    "name": "V23", "required": true}, {"type": "double", "name": "V24", "required":
+    true}, {"type": "double", "name": "V25", "required": true}, {"type": "double",
+    "name": "V26", "required": true}, {"type": "double", "name": "V27", "required":
+    true}, {"type": "double", "name": "V28", "required": true}, {"type": "double",
+    "name": "Amount_scaled", "required": true}, {"type": "double", "name": "Time_scaled",
+    "required": true}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "int64", "shape": [-1]}}]'
+  params: null
+utc_time_created: '2026-05-02 13:19:17.233136'
