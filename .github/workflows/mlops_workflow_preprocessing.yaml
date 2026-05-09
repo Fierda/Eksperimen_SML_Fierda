@@ -1,0 +1,54 @@
+name: MLOps Workflow
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'preprocessing/**'
+
+jobs:
+  # ============================================================
+  # JOB 1: Preprocessing Pipeline
+  # ============================================================
+  preprocess:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12.7
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.7'
+
+      - name: Install Dependencies
+        run: |
+          pip install pandas numpy scikit-learn kaggle
+
+      - name: Download & Preprocess Dataset
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          python preprocessing/automate_Fierda.py
+
+      - name: Verify Output
+        run: |
+          echo "=== Verify preprocessing output ==="
+          ls -la preprocessing/
+          head -5 preprocessing/creditcard_preprocessed.csv
+          wc -l preprocessing/creditcard_preprocessed.csv
+
+      - name: Commit & Push Preprocessed Dataset
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add preprocessing/creditcard_preprocessed.csv
+          git diff --cached --quiet || git commit -m "chore: update preprocessed dataset [automated]"
+          git push
+

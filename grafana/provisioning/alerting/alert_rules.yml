@@ -45,6 +45,7 @@ groups:
           summary: High error rate detected on Fraud API
         labels:
           severity: critical
+          mlops: "1"
 
       - uid: high_latency
         title: High Prediction Latency (> 0.5s)
@@ -85,15 +86,16 @@ groups:
           summary: Prediction P95 latency is too high
         labels:
           severity: warning
+          mlops: "1"
 
-      - uid: data_drift
-        title: Data Drift Detected (> 0.8)
+      - uid: high_fraud_ratio
+        title: High Fraud Ratio Detected (> 10%)
         condition: B
         data:
           - refId: A
             datasourceUid: prometheus
             model:
-              expr: data_drift_score
+              expr: sum(rate(fraud_detected_total[5m])) / sum(rate(http_requests_total[5m]))
               intervalMs: 1000
               maxDataPoints: 43200
             relativeTimeRange:
@@ -108,7 +110,7 @@ groups:
               conditions:
                 - evaluator:
                     type: gt
-                    params: [0.8]
+                    params: [0.1]
                   operator:
                     type: and
                   query:
@@ -122,6 +124,7 @@ groups:
         execErrState: Error
         for: 1m
         annotations:
-          summary: High data drift score detected
+          summary: Fraud ratio exceeded 10% of total transactions
         labels:
           severity: warning
+          mlops: "1"

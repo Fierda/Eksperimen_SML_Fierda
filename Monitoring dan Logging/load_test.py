@@ -38,9 +38,9 @@ def run_load_test():
     
     try:
         while True:
-            # Simulate 5-15 requests per second
+            # Simulate heavy traffic (50-100 concurrent requests)
             threads = []
-            for _ in range(random.randint(5, 15)):
+            for _ in range(random.randint(50, 100)):
                 t = threading.Thread(target=send_request)
                 t.start()
                 threads.append(t)
@@ -48,7 +48,7 @@ def run_load_test():
             for t in threads:
                 t.join()
                 
-            time.sleep(1)
+            # No sleep! Blast the server continuously
     except KeyboardInterrupt:
         print("\nLoad testing stopped.")
 

@@ -22,10 +22,9 @@ ERROR_RATE = Counter("http_error_responses_total", "Total error responses (4xx/5
 MODEL_LATENCY = Histogram("model_prediction_latency_seconds", "Model prediction latency time (seconds)", buckets=[0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 1.0])
 MEMORY_USAGE = Gauge("system_memory_usage_bytes", "System memory usage (bytes)")
 CPU_USAGE = Gauge("system_cpu_usage_percent", "System CPU usage (%)")
-PREDICTION_CONFIDENCE = Gauge("model_prediction_confidence", "Confidence score of the last prediction")
-#ACTIVE_SESSIONS = Gauge("active_user_sessions", "Number of active inference sessions")
+BATCH_SIZE = Histogram("prediction_batch_size", "Number of rows per prediction request", buckets=[1, 5, 10, 50, 100, 500])
 ACTIVE_SESSIONS = Gauge("active_user_sessions", "Number of active inference sessions")
-DATA_DRIFT_SCORE = Gauge("data_drift_score", "Input data distribution anomaly score (0-1)")
+ROWS_PROCESSED = Counter("rows_processed_total", "Total number of rows processed by the model")
 MODEL_INFO = Info("model", "Running Model Information")
 
 MODEL_INFO.info({"name": "FraudModel", "version": "1", "framework": "scikit-learn", "developer": "Fierda"})
@@ -54,11 +53,6 @@ def get_system_metrics():
         return cpu, mem.used
     except Exception:
         return 0.0, 0
-
-class DummyModel:
-    """Fallback model for demo/monitoring when no MLflow model is available."""
-    def predict(self, df):
-        return np.array([random.choice([0, 1]) for _ in range(len(df))])
 
 def load_model():
     global model
@@ -90,8 +84,8 @@ def load_model():
                         return
                 except Exception:
                     continue
-        print("[WARN] No MLflow model found. Using DummyModel for demo/monitoring.")
-        model = DummyModel()
+        print("[WARN] No MLflow model found. API will return 503 until a valid model is loaded.")
+        model = None
 
 
 @app.route("/health", methods=["GET"])
@@ -135,18 +129,16 @@ def predict():
 
         predictions = model.predict(df)
 
-        confidence = random.uniform(0.6, 0.99)
-        PREDICTION_CONFIDENCE.set(confidence)
+        BATCH_SIZE.observe(len(df))
+        ROWS_PROCESSED.inc(len(df))
 
         fraud_count = int(sum(predictions))
         normal_count = int(len(predictions) - sum(predictions))
 
         if fraud_count > 0:
             FRAUD_DETECTED.inc(fraud_count)
-            DATA_DRIFT_SCORE.set(random.uniform(0.7, 1.0))
         if normal_count > 0:
             NORMAL_DETECTED.inc(normal_count)
-            DATA_DRIFT_SCORE.set(random.uniform(0.05, 0.3))
 
         result = {
             "predictions": predictions.tolist(),
@@ -161,7 +153,8 @@ def predict():
         CPU_USAGE.set(cpu)
         MEMORY_USAGE.set(mem)
 
-        time.sleep(random.uniform(0.3, 0.8))
+        # Menambahkan delay statis 0.5 detik agar request sedikit mengantre (hanya untuk memunculkan metrik Active Session)
+        time.sleep(0.5)
 
         with _active_lock:
             _active_count -= 1

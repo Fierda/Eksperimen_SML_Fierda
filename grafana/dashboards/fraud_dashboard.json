@@ -173,7 +173,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Prediction Confidence",
+      "title": "Rows Processed Rate",
       "gridPos": {
         "h": 8,
         "w": 8,
@@ -191,7 +191,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "model_prediction_confidence"
+          "expr": "rate(rows_processed_total[1m])"
         }
       ]
     },
@@ -221,7 +221,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Data Drift Score",
+      "title": "Average Batch Size",
       "gridPos": {
         "h": 8,
         "w": 8,
@@ -239,7 +239,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "data_drift_score"
+          "expr": "sum(rate(prediction_batch_size_sum[1m])) / sum(rate(prediction_batch_size_count[1m]))"
         }
       ]
     }
