@@ -1,3 +1,0 @@
-https://github.com/Fierda/MLOps_Fraud_Detection_CICD.git
-
-saya gabung dengan workflow kriteria 1

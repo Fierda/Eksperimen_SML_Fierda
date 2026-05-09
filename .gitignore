@@ -1,3 +1,10 @@
 creditcard_preprocessing.csv
 creditcard_preprocessed.csv
-.gitignore
+
+# Ignore all files in the root directory
+/*
+
+# Except these folders and files
+!/.github/
+!/preprocessing/
+!/.gitignore
